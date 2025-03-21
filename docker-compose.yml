@@ -1,6 +1,7 @@
 services:
   api:
     image: "ghcr.io/upciti/front-end-interview-fake-api:main"
+    platform: linux/amd64
     restart: always
     environment:
       FRONT_URL: "http://localhost:5173"
