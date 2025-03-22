@@ -24,7 +24,6 @@ This project is a Vue 3 application that visualizes hourly data using bar charts
    yarn test
    ```
 
-
 ## Librairies and Tools
 
 - **Vue 3**: Chosen for its reactivity and simplicity in managing component states.

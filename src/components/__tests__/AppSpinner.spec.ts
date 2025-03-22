@@ -1,9 +1,9 @@
-import { describe, it, expect } from 'vitest'
+import AppSpinner from '@/components/generic/AppSpinner.vue'
 
 import { mount } from '@vue/test-utils'
-import AppSpinner from '../AppSpinner.vue'
+import { describe, expect, it } from 'vitest'
 
-describe('AppSpinner', () => {
+describe('appSpinner', () => {
   it('renders properly', () => {
     const wrapper = mount(AppSpinner)
     expect(wrapper.find('svg').exists()).toBe(true)
