@@ -1,9 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Boldonse&family=Manrope:wght@200..800&display=swap');
 
 @import "tailwindcss";
 @import './base.css';
 
 @theme {
   --font-manrope: 'Manrope', sans-serif;
+  --font-boldonse: 'Boldonse', sans-serif;
 }
 
