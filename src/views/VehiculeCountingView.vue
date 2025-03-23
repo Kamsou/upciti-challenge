@@ -1,22 +1,22 @@
 <script lang="ts" setup>
 import type { AverageResponse, TimeValue } from '@/types/api'
-import { chartOptions } from '@/chartConfig'
-import { colors } from '@/colors'
+import { barChartOptions } from '@/chartConfig'
 import AppSpinner from '@/components/generic/AppSpinner.vue'
 import VehiculeCoutingKPIs from '@/components/specific/VehiculeCoutingKPIs.vue'
+import { getData } from '@/services/default'
 import {
   BarElement,
   CategoryScale,
   Chart as ChartJS,
   Legend,
   LinearScale,
+  LineElement,
+  PointElement,
   Title,
   Tooltip,
-  LineElement, // Importez LineElement pour les graphiques en ligne
-  PointElement, // Importez PointElement
 } from 'chart.js'
 import { computed, onMounted, ref } from 'vue'
-import { Bar, Line } from 'vue-chartjs'
+import { Bar } from 'vue-chartjs'
 
 ChartJS.register(
   Title,
@@ -25,26 +25,52 @@ ChartJS.register(
   BarElement,
   CategoryScale,
   LinearScale,
-  LineElement, // Enregistrez LineElement
-  PointElement, // Enregistrez PointElement
+  LineElement,
+  PointElement,
 )
 
 const isLoading = ref<boolean>(false)
-const chartData = ref<{ hour: string, average: number }[]>([])
+const hasError = ref<boolean>(false)
 
-const chartDataForChart = computed(() => {
+const hourlyAverages = ref<Record<string, number>>({})
+
+const chartData = computed(() => {
+  if (!hourlyAverages.value) {
+    return null
+  }
+
+  return Object.keys(hourlyAverages.value).map((hour) => {
+    const average = hourlyAverages.value[hour]
+    const formattedAverage = typeof average === 'number' ? Number.parseFloat(average.toFixed(2)) : 0
+
+    return {
+      hour,
+      average: formattedAverage,
+    }
+  })
+})
+
+const barChartData = computed(() => {
   const hours = Array.from({ length: 24 }, (_, i) => i.toString())
-  const averages = hours.map(
-    hour => chartData.value.find(data => data.hour === hour)?.average || 0,
+
+  if (!chartData.value || chartData.value.length === 0) {
+    return null
+  }
+
+  const averages = hours.map(hour =>
+    chartData.value?.find(data => data.hour === hour)?.average || 0,
   )
+
+  if (!averages || averages.length !== 24) {
+    return null
+  }
 
   return {
     labels: hours,
     datasets: [
       {
         label: 'Average traffic (cars/hour)',
-        backgroundColor: colors.primary.DEFAULT,
-
+        backgroundColor: '#8AED4A',
         borderWidth: 1,
         data: averages,
       },
@@ -64,34 +90,14 @@ const kpis = ref<{
   hourlyAveragesByWeekday: {},
 })
 
-const chartDataForWeekday = computed(() => {
-  const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-  const averages = weekdays.map(day => kpis.value.hourlyAveragesByWeekday[day] || 0)
-
-  return {
-    labels: weekdays,
-    datasets: [
-      {
-        label: 'Average Traffic by Weekday',
-        backgroundColor: colors.primary.light,
-        borderWidth: 1,
-        data: averages,
-      },
-    ],
-  }
-})
-
 async function fetchData() {
   try {
     isLoading.value = true
-    const response = await fetch('http://localhost:3000/data')
-    const data: AverageResponse = await response.json()
+    hasError.value = false
 
-    chartData.value = Object.keys(data.hourlyAverages).map(hour => ({
-      hour,
-      average: Number.parseFloat(data.hourlyAverages[hour].toFixed(2)),
-    }))
+    const data: AverageResponse = await getData()
 
+    hourlyAverages.value = data.hourlyAverages
     kpis.value.highestAverage = data.hourWithHighestAverage
     kpis.value.lowestAverage = data.hourWithLowestAverage
     kpis.value.overallHourlyAverage = data.overallHourlyAverage
@@ -99,6 +105,7 @@ async function fetchData() {
   }
   catch (error) {
     console.error('Error fetching data:', error)
+    hasError.value = true
   }
   finally {
     isLoading.value = false
@@ -111,61 +118,57 @@ onMounted(() => {
 </script>
 
 <template>
-  <main>
-    <header
-      class="bg-white border-b border-t border-gray-200 p-4 flex justify-between items-center"
-    >
-      <p class="text-base">
-        General
-      </p>
-      <p class="text-sm">
-        Hello
-      </p>
-    </header>
+  <section v-if="isLoading" class="text-center text-gray-600 h-[500px] lg:h-4/5 flex items-center justify-center">
+    <AppSpinner />
+  </section>
 
-    <section v-if="!isLoading" class="p-4 w-full flex flex-col lg:flex-row gap-6">
-      <div class="w-full">
-        <VehiculeCoutingKPIs :kpis="kpis" />
+  <section v-else-if="hasError" class="text-center text-red-600 p-4 h-[500px] lg:h-4/5 flex flex-col items-center justify-center">
+    <p class="text-2xl font-boldonse pb-2">
+      Error fetching data
+    </p>
+    <p class="text-sm">
+      Please try again later
+    </p>
+  </section>
 
-        <div class="flex flex-col lg:flex-row gap-6">
-          <div class="flex flex-col lg:flex-row w-full lg:w-1/2">
-            <div class="w-full border rounded-md border-gray-200 bg-white">
-              <div class="pb-4 flex-col font-bold mb-6 text-gray-800 flex text-left border-b border-gray-200 p-6">
-                <p class="text-sm md:text-base">
-                  Road Traffic Counting
-                </p>
+  <section v-else class="p-4 w-full flex flex-col lg:flex-row gap-6">
+    <div class="w-full">
+      <VehiculeCoutingKPIs :kpis="kpis" />
 
-                <p class="text-sm md:text-xs text-gray-400">
-                  Tracks vehicle flow, aiding in traffic management and urban planning.
-                </p>
-              </div>
+      <div class="flex flex-col lg:flex-row gap-6">
+        <div class="flex flex-col lg:flex-row w-full lg:w-1/2">
+          <div class="w-full border rounded-md border-gray-200 bg-white">
+            <div class="pb-4 flex-col font-bold mb-6 text-gray-800 flex text-left border-b border-gray-200 p-6">
+              <p class="text-sm md:text-base">
+                Road Traffic Counting
+              </p>
 
-              <div class="h-[400px]">
-                <Bar :data="chartDataForChart" :options="chartOptions" />
+              <p class="text-sm md:text-xs text-gray-400">
+                Tracks vehicle flow, aiding in traffic management and urban planning.
+              </p>
+            </div>
+
+            <div class="h-[400px]">
+              <Bar v-if="barChartData" :data="barChartData" :options="barChartOptions" />
+              <div v-else data-test="bar-chart-no-data-message" class="flex items-center justify-center h-full text-gray-300">
+                No data available
               </div>
             </div>
           </div>
+        </div>
 
-          <div class="flex flex-col lg:flex-row w-full lg:w-1/2 relative h-[300px] lg:h-auto">
-            <div class="w-full h-full border border-green-800 rounded-md" />
-            <div class="text-green-800 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-              <p class="text-2xl font-boldonse">
-                Coming soon
-              </p>
-              <p class="text-sm">
-                Stay tuned for more updates
-              </p>
-              </div>
+        <div class="flex flex-col lg:flex-row w-full lg:w-1/2 relative h-[300px] lg:h-auto">
+          <div class="w-full h-full border border-gray-300 rounded-md" />
+          <div class="border-gray-300 text-gray-300 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+            <p class="text-2xl font-boldonse">
+              Coming soon
+            </p>
+            <p class="text-sm">
+              Stay tuned for more updates
+            </p>
           </div>
         </div>
       </div>
-    </section>
-
-    <div
-      v-else
-      class="text-center text-gray-600 h-4/5 flex items-center justify-center"
-    >
-      <AppSpinner />
     </div>
-  </main>
+  </section>
 </template>

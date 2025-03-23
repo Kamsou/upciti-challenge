@@ -1,6 +1,6 @@
 import type { TooltipItem } from 'chart.js'
 
-export const chartOptions = {
+export const barChartOptions = {
   responsive: true,
   maintainAspectRatio: false,
   layout: {
@@ -85,7 +85,6 @@ export const chartOptions = {
       },
     },
   },
-
   animation: {
     duration: 1500,
     easing: 'easeOutQuart' as const,
