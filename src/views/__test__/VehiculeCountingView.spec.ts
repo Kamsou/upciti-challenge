@@ -18,7 +18,6 @@ describe('vehiculeCountingView', () => {
       hourWithHighestAverage: { time: '12', value: 23 },
       hourWithLowestAverage: { time: '0', value: 0 },
       overallHourlyAverage: 11.5,
-      hourlyAveragesByWeekday: {},
     })
   })
 
@@ -61,7 +60,6 @@ describe('vehiculeCountingView', () => {
       hourWithHighestAverage: { time: '12', value: 23 },
       hourWithLowestAverage: { time: '0', value: 0 },
       overallHourlyAverage: 11.5,
-      hourlyAveragesByWeekday: {},
     })
 
     const wrapper = mount(VehiculeCountingView)

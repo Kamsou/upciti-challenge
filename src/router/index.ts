@@ -4,7 +4,7 @@ import VehiculeCountingView from '@/views/VehiculeCountingView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const routes: Array<RouteRecordRaw> = [
-  { path: '/', redirect: '/vehicule-counting', name: 'Vehicule Counting' },
+  { path: '/', redirect: { name: 'Vehicule Counting' } },
   { path: '/vehicule-counting', component: VehiculeCountingView, name: 'Vehicule Counting' },
   { path: '/pedestrian-counting', component: PedestrianCountingView, name: 'Pedestrian Counting' },
 ]

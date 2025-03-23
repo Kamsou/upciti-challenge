@@ -33,9 +33,9 @@ export const barChartOptions = {
     y: {
       title: {
         display: true,
-        text: 'Average Number of Cars',
+        text: 'Number of Vehicles',
         font: {
-          size: 10,
+          size: 12,
         },
       },
       ticks: {
@@ -74,7 +74,7 @@ export const barChartOptions = {
       boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
       callbacks: {
         label(tooltipItem: TooltipItem<'bar'>) {
-          return `\u00A0 ${(tooltipItem.raw as number).toFixed(2)} cars/hour`
+          return `\u00A0 ${(tooltipItem.raw as number).toFixed(2)} vehicles/hour`
         },
         title(tooltipItems: TooltipItem<'bar'>[]) {
           const hour = Number.parseInt(tooltipItems[0].label, 10)

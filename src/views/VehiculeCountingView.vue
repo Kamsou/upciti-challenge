@@ -4,74 +4,32 @@ import { barChartOptions } from '@/chartConfig'
 import AppSpinner from '@/components/generic/AppSpinner.vue'
 import VehiculeCoutingKPIs from '@/components/specific/VehiculeCoutingKPIs.vue'
 import { getData } from '@/services/default'
-import {
-  BarElement,
-  CategoryScale,
-  Chart as ChartJS,
-  Legend,
-  LinearScale,
-  LineElement,
-  PointElement,
-  Title,
-  Tooltip,
-} from 'chart.js'
 import { computed, onMounted, ref } from 'vue'
 import { Bar } from 'vue-chartjs'
-
-ChartJS.register(
-  Title,
-  Tooltip,
-  Legend,
-  BarElement,
-  CategoryScale,
-  LinearScale,
-  LineElement,
-  PointElement,
-)
 
 const isLoading = ref<boolean>(false)
 const hasError = ref<boolean>(false)
 
 const hourlyAverages = ref<Record<string, number>>({})
 
-const chartData = computed(() => {
-  if (!hourlyAverages.value) {
-    return null
-  }
-
-  return Object.keys(hourlyAverages.value).map((hour) => {
-    const average = hourlyAverages.value[hour]
-    const formattedAverage = typeof average === 'number' ? Number.parseFloat(average.toFixed(2)) : 0
-
-    return {
-      hour,
-      average: formattedAverage,
-    }
-  })
-})
-
 const barChartData = computed(() => {
   const hours = Array.from({ length: 24 }, (_, i) => i.toString())
 
-  if (!chartData.value || chartData.value.length === 0) {
+  if (!hourlyAverages.value || Object.keys(hourlyAverages.value).length === 0) {
     return null
   }
 
-  const averages = hours.map(hour =>
-    chartData.value?.find(data => data.hour === hour)?.average || 0,
-  )
-
-  if (!averages || averages.length !== 24) {
-    return null
-  }
+  const averages = hours.map((hour) => {
+    const average = hourlyAverages.value[hour]
+    return typeof average === 'number' ? Number.parseFloat(average.toFixed(2)) : 0
+  })
 
   return {
     labels: hours,
     datasets: [
       {
-        label: 'Average traffic (cars/hour)',
+        label: 'Average traffic (vehicles/hour)',
         backgroundColor: '#8AED4A',
-        borderWidth: 1,
         data: averages,
       },
     ],
@@ -82,12 +40,10 @@ const kpis = ref<{
   highestAverage: TimeValue
   lowestAverage: TimeValue
   overallHourlyAverage: number
-  hourlyAveragesByWeekday: Record<string, number>
 }>({
   highestAverage: { time: '', value: 0 },
   lowestAverage: { time: '', value: 0 },
   overallHourlyAverage: 0,
-  hourlyAveragesByWeekday: {},
 })
 
 async function fetchData() {
@@ -95,13 +51,12 @@ async function fetchData() {
     isLoading.value = true
     hasError.value = false
 
-    const data: AverageResponse = await getData()
+    const response: AverageResponse = await getData()
 
-    hourlyAverages.value = data.hourlyAverages
-    kpis.value.highestAverage = data.hourWithHighestAverage
-    kpis.value.lowestAverage = data.hourWithLowestAverage
-    kpis.value.overallHourlyAverage = data.overallHourlyAverage
-    kpis.value.hourlyAveragesByWeekday = data.hourlyAveragesByWeekday
+    hourlyAverages.value = response.hourlyAverages
+    kpis.value.highestAverage = response.hourWithHighestAverage
+    kpis.value.lowestAverage = response.hourWithLowestAverage
+    kpis.value.overallHourlyAverage = response.overallHourlyAverage
   }
   catch (error) {
     console.error('Error fetching data:', error)
@@ -139,8 +94,9 @@ onMounted(() => {
         <div class="flex flex-col lg:flex-row w-full lg:w-1/2">
           <div class="w-full border rounded-md border-gray-200 bg-white">
             <div class="pb-4 flex-col font-bold mb-6 text-gray-800 flex text-left border-b border-gray-200 p-6">
-              <p class="text-sm md:text-base">
+              <p class="text-sm md:text-base flex items-center gap-2">
                 Road Traffic Counting
+                <img src="@/assets/cars.svg" alt="cars" class="h-6 w-6">
               </p>
 
               <p class="text-sm md:text-xs text-gray-400">

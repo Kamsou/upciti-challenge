@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import SidebarNavigation from '@/components/specific/SidebarNavigation.vue'
+import AppHeader from './components/generic/AppHeader.vue'
 </script>
 
 <template>
@@ -7,23 +8,13 @@ import SidebarNavigation from '@/components/specific/SidebarNavigation.vue'
     <SidebarNavigation />
 
     <main class="w-full">
-      <header
-        class="bg-white border-b border-t border-gray-200 p-4 flex justify-between items-center"
-      >
-        <p class="text-base">
-          {{ $route.name }}
-        </p>
-
-        <div
-          class="flex justify-center items-center w-8 h-8 rounded-full overflow-hidden border-2 border-white shadow-md"
-        >
-          <img
-            src="@/assets/aya-nakamura.jpg"
-            alt="User Avatar"
-            class="w-full h-full object-cover"
-          >
-        </div>
-      </header>
+      <AppHeader>
+        <template #left>
+          <p class="text-base">
+            {{ $route.name }}
+          </p>
+        </template>
+      </AppHeader>
 
       <RouterView class="w-full" />
     </main>
