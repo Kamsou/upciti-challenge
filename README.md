@@ -1,6 +1,6 @@
 # Upciti x Camille Coutens - Dashboard example
 
-![Screen](./assets/screen.png)
+![Screen](https://res.cloudinary.com/augalo/image/upload/v1742754095/work/screen_v9ekza.png)
 
 This project is a Vue 3 application that visualizes hourly data using bar charts and displays key performance indicators (KPI).
 
