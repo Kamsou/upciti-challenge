@@ -4,26 +4,32 @@
 
 This project is a Vue 3 application that visualizes hourly data using bar charts and displays key performance indicators (KPI).
 
-## Project Setup Instructions
+##  Getting started
 
 ### Installation
 
-1. **Install dependencies:**
+1. **Clone the repository:**
+
+   ```bash
+   git git@github.com:Kamsou/upciti-challenge.git
+   ```
+
+2. **Install dependencies:**
 
    ```bash
    yarn
     ```
 
-2. **Open the app :**
+3. **Open the app :**
 
    ```bash
    yarn dev
    ```
 
-3. **Run the tests:**
+4. **Run the tests:**
 
    ```bash
-   yarn test
+   yarn test:unit
    ```
 
 ### Docker
