@@ -59,7 +59,7 @@ This project is a Vue 3 application that visualizes hourly data using bar charts
 
 ## Limitations or Known Issues
 - **Data Fetching**: The application currently fetches data from a hardcoded API endpoint. This could be made configurable.
-- **Error Handling**: Basic error handling is implemented, but it could be more comprehensive.
+- **Error Handling**: Basic error handling is implemented, but it could be improved with monitoring and logging.
 - **Testing**: Limited unit tests are currently in place; more extensive testing would be beneficial.
 - **Browser Compatibility**: The application has been tested on modern browsers and may not work on older browsers.
 - **Environment Variables**: This application does not use environment variables, which could be useful for configuration.
@@ -71,3 +71,5 @@ This project is a Vue 3 application that visualizes hourly data using bar charts
 - **Internationalization**: Add support for multiple languages.
 - **User Authentication**: Implement user authentication and authorization.
 - **Dark Mode**: Add a dark mode theme for the application.
+- **Tooltip management**: Add tooltips to prevent users of available data.
+- **Accessibility**: The application is not fully accessible and could be improved for users with disabilities.
